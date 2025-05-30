@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - SE Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .project-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .project-info p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .form-container {
+            display: none;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .student-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .student-info p {
+            margin: 8px 0;
+            color: #5a6c7d;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 80px;
+            color: #34495e;
+        }
+
+        .gpa-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .gpa-excellent { background: #d5f4e6; color: #27ae60; }
+        .gpa-good { background: #fef9e7; color: #f39c12; }
+        .gpa-average { background: #fadbd8; color: #e74c3c; }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            background: #fadbd8;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .success-message {
+            background: #d5f4e6;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #27ae60;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Student Management System</h1>
+            <div class="project-info">
+                <p><strong>Software Engineering Project</strong></p>
+                <p>Students: Ankit Kumar (410/222) & Ankit Rai (411/222)</p>
+                <p>Faculty: Mr. A. Bhishek Bakhla | Dept: Electronics & Computer Engineering</p>
+                <p>Institution: NIT Ranchi, Hatia</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="message-container"></div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-students">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avg-gpa">0.0</div>
+                    <div class="stat-label">Average GPA</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-courses">0</div>
+                    <div class="stat-label">Active Courses</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="toggleAddForm()">
+                    ➕ Add New Student
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    📊 Export Data
+                </button>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    🗑️ Clear All Data
+                </button>
+            </div>
+
+            <div class="form-container" id="student-form">
+                <h2 id="form-title">Add New Student</h2>
+                <form id="studentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="studentName">Full Name *</label>
+                            <input type="text" id="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Email Address *</label>
+                            <input type="email" id="studentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentPhone">Phone Number</label>
+                            <input type="tel" id="studentPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentCourse">Course *</label>
+                            <select id="studentCourse" required>
+                                <option value="">Select Course</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Electronics Engineering">Electronics Engineering</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Electrical Engineering">Electrical Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentSemester">Semester *</label>
+                            <select id="studentSemester" required>
+                                <option value="">Select Semester</option>
+                                <option value="1">1st Semester</option>
+                                <option value="2">2nd Semester</option>
+                                <option value="3">3rd Semester</option>
+                                <option value="4">4th Semester</option>
+                                <option value="5">5th Semester</option>
+                                <option value="6">6th Semester</option>
+                                <option value="7">7th Semester</option>
+                                <option value="8">8th Semester</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentGPA">GPA (0.0 - 10.0) *</label>
+                            <input type="number" id="studentGPA" min="0" max="10" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button type="submit" class="btn btn-success">
+                            💾 Save Student
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="cancelForm()">
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="🔍 Search students by name, email, course, or semester...">
+            </div>
+
+            <div id="students-container">
+                <div class="empty-state">
+                    <h3>No Students Found</h3>
+                    <p>Add your first student to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Student Management System - Software Engineering Project
+        // Demonstrates key SE principles: Modularity, Encapsulation, Abstraction, DRY
+
+        class Student {
+            constructor(name, email, phone, course, semester, gpa) {
+                this.id = this.generateId();
+                this.name = name;
+                this.email = email;
+                this.phone = phone;
+                this.course = course;
+                this.semester = semester;
+                this.gpa = parseFloat(gpa);
+                this.createdAt = new Date().toISOString();
+            }
+
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+
+            getGpaCategory() {
+                if (this.gpa >= 8.5) return 'excellent';
+                if (this.gpa >= 7.0) return 'good';
+                return 'average';
+            }
+        }
+
+        class StudentManager {
+            constructor() {
+                this.students = this.loadStudents();
+                this.currentEditId = null;
+            }
+
+            // Data persistence methods
+            loadStudents() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('students') || '[]');
+                    return data.map(s => Object.assign(new Student(), s));
+                } catch (error) {
+                    console.error('Failed to load students:', error);
+                    return [];
+                }
+            }
+
+            saveStudents() {
+                try {
+                    localStorage.setItem('students', JSON.stringify(this.students));
+                    this.updateStats();
+                } catch (error) {
+                    this.showMessage('Failed to save data', 'error');
+                }
+            }
+
+            // CRUD Operations
+            addStudent(studentData) {
+                try {
+                    if (this.emailExists(studentData.email)) {
+                        throw new Error('Email already exists');
+                    }
+                    
+                    const student = new Student(
+                        studentData.name,
+                        studentData.email,
+                        studentData.phone,
+                        studentData.course,
+                        studentData.semester,
+                        studentData.gpa
+                    );
+                    
+                    this.students.push(student);
+                    this.saveStudents();
+                    this.showMessage('Student added successfully!', 'success');
+                    return true;
+                } catch (error) {
+                    this.showMessage(error.message, 'error');
+                    return false;
+                }
+            }
+
+            updateStudent(id, studentData) {
+                try {
+                    const index = this.students.findIndex(s => s.id === id);
+                    if (index === -1) throw new Error('Student not found');
+
+                    // Check email uniqueness (excluding current student)
+                    const emailExists = this.students.some(s => 
+                        s.email === studentData.email && s.id !== id
+                    );
+                    if (emailExists) throw new Error('Email already exists');
+
+                    // Update student data
+                    Object.assign(this.students[index], {
+                        name: studentData.name,
+                        email: studentData.email,
+                        phone: studentData.phone,
+                        course: studentData.course,
+                        semester: studentData.semester,
+                        gpa: parseFloat(studentData.gpa)
+                    });
+
+                    this.saveStudents();
+                    this.showMessage('Student updated successfully!', 'success');
+                    return true;
+                } catch (error) {
+                    this.showMessage(error.message, 'error');
+                    return false;
+                }
+            }
+
+            deleteStudent(id) {
+                try {
+                    const index = this.students.findIndex(s => s.id === id);
+                    if (index === -1) throw new Error('Student not found');
+                    
+                    this.students.splice(index, 1);
+                    this.saveStudents();
+                    this.showMessage('Student deleted successfully!', 'success');
+                    this.renderStudents();
+                } catch (error) {
+                    this.showMessage(error.message, 'error');
+                }
+            }
+
+            // Utility methods
+            emailExists(email) {
+                return this.students.some(s => s.email === email);
+            }
+
+            searchStudents(query) {
+                if (!query) return this.students;
+                
+                const lowercaseQuery = query.toLowerCase();
+                return this.students.filter(student => 
+                    student.name.toLowerCase().includes(lowercaseQuery) ||
+                    student.email.toLowerCase().includes(lowercaseQuery) ||
+                    student.course.toLowerCase().includes(lowercaseQuery) ||
+                    student.semester.toString().includes(lowercaseQuery)
+                );
+            }
+
+            // UI Methods
+            showMessage(message, type = 'info') {
+                const container = document.getElementById('message-container');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `${type}-message`;
+                messageDiv.textContent = message;
+                
+                container.innerHTML = '';
+                container.appendChild(messageDiv);
+                
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+
+            updateStats() {
+                const totalStudents = this.students.length;
+                const avgGpa = totalStudents > 0 ? 
+                    (this.students.reduce((sum, s) => sum + s.gpa, 0) / totalStudents).toFixed(1) : 
+                    '0.0';
+                const uniqueCourses = new Set(this.students.map(s => s.course)).size;
+
+                document.getElementById('total-students').textContent = totalStudents;
+                document.getElementById('avg-gpa').textContent = avgGpa;
+                document.getElementById('total-courses').textContent = uniqueCourses;
+            }
+
+            renderStudents(studentsToRender = null) {
+                const container = document.getElementById('students-container');
+                const students = studentsToRender || this.students;
+
+                if (students.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No Students Found</h3>
+                            <p>Add your first student to get started!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="students-grid">
+                        ${students.map(student => `
+                            <div class="student-card">
+                                <div class="student-info">
+                                    <h3>${student.name}</h3>
+                                    <p><span class="info-label">Email:</span> ${student.email}</p>
+                                    <p><span class="info-label">Phone:</span> ${student.phone || 'N/A'}</p>
+                                    <p><span class="info-label">Course:</span> ${student.course}</p>
+                                    <p><span class="info-label">Semester:</span> ${student.semester}</p>
+                                    <p>
+                                        <span class="info-label">GPA:</span> 
+                                        ${student.gpa}
+                                        <span class="gpa-badge gpa-${student.getGpaCategory()}">
+                                            ${student.getGpaCategory().toUpperCase()}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn btn-primary btn-small" onclick="editStudent('${student.id}')">
+                                        ✏️ Edit
+                                    </button>
+                                    <button class="btn btn-danger btn-small" onclick="confirmDelete('${student.id}')">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            exportData() {
+                try {
+                    const dataStr = JSON.stringify(this.students, null, 2);
+                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                    
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(dataBlob);
+                    link.download = `students_data_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.showMessage('Data exported successfully!', 'success');
+                } catch (error) {
+                    this.showMessage('Failed to export data', 'error');
+                }
+            }
+
+            clearAllData() {
+                this.students = [];
+                this.saveStudents();
+                this.renderStudents();
+                this.showMessage('All data cleared successfully!', 'success');
+            }
+        }
+
+        // Initialize the application
+        const studentManager = new StudentManager();
+
+        // Event Listeners and UI Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            studentManager.renderStudents();
+            studentManager.updateStats();
+
+            // Form submission
+            document.getElementById('studentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    name: document.getElementById('studentName').value.trim(),
+                    email: document.getElementById('studentEmail').value.trim(),
+                    phone: document.getElementById('studentPhone').value.trim(),
+                    course: document.getElementById('studentCourse').value,
+                    semester: document.getElementById('studentSemester').value,
+                    gpa: document.getElementById('studentGPA').value
+                };
+
+                // Validation
+                if (!formData.name || !formData.email || !formData.course || 
+                    !formData.semester || !formData.gpa) {
+                    studentManager.showMessage('Please fill all required fields', 'error');
+                    return;
+                }
+
+                if (formData.gpa < 0 || formData.gpa > 10) {
+                    studentManager.showMessage('GPA must be between 0.0 and 10.0', 'error');
+                    return;
+                }
+
+                let success;
+                if (studentManager.currentEditId) {
+                    success = studentManager.updateStudent(studentManager.currentEditId, formData);
+                } else {
+                    success = studentManager.addStudent(formData);
+                }
+
+                if (success) {
+                    this.reset();
+                    toggleAddForm();
+                    studentManager.renderStudents();
+                    studentManager.currentEditId = null;
+                }
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                const filteredStudents = studentManager.searchStudents(query);
+                studentManager.renderStudents(filteredStudents);
+            });
+        });
+
+        // UI Control Functions
+        function toggleAddForm() {
+            const form = document.getElementById('student-form');
+            const title = document.getElementById('form-title');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                document.getElementById('studentForm').reset();
+                studentManager.currentEditId = null;
+            } else {
+                form.classList.add('active');
+                title.textContent = 'Add New Student';
+                document.getElementById('studentName').focus();
+            }
+        }
+
+        function cancelForm() {
+            const form = document.getElementById('student-form');
+            form.classList.remove('active');
+            document.getElementById('studentForm').reset();
+            studentManager.currentEditId = null;
+        }
+
+        function editStudent(id) {
+            const student = studentManager.students.find(s => s.id === id);
+            if (!student) return;
+
+            // Populate form with student data
+            document.getElementById('studentName').value = student.name;
+            document.getElementById('studentEmail').value = student.email;
+            document.getElementById('studentPhone').value = student.phone || '';
+            document.getElementById('studentCourse').value = student.course;
+            document.getElementById('studentSemester').value = student.semester;
+            document.getElementById('studentGPA').value = student.gpa;
+
+            // Show form and update title
+            const form = document.getElementById('student-form');
+            const title = document.getElementById('form-title');
+            form.classList.add('active');
+            title.textContent = 'Edit Student';
+            
+            studentManager.currentEditId = id;
+            document.getElementById('studentName').focus();
+        }
+
+        function confirmDelete(id) {
+            const student = studentManager.students.find(s => s.id === id);
+            if (!student) return;
+
+            if (confirm(`Are you sure you want to delete ${student.name}?`)) {
+                studentManager.deleteStudent(id);
+            }
+        }
+
+        function exportData() {
+            studentManager.exportData();
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all student data? This action cannot be undone.')) {
+                studentManager.clearAllData();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                toggleAddForm();
+            }
+            if (e.key === 'Escape') {
+                cancelForm();
+            }
+        });
+
+        // Add some sample data for demonstration
+        function addSampleData() {
+            const sampleStudents = [
+                {
+                    name: 'Raj Kumar Singh',
+                    email: 'raj.singh@nitranchi.ac.in',
+                    phone: '9876543210',
+                    course: 'Computer Science',
+                    semester: '6',
+                    gpa: '8.7'
+                },
+                {
+                    name: 'Priya Sharma',
+                    email: 'priya.sharma@nitranchi.ac.in',
+                    phone: '9876543211',
+                    course: 'Electronics Engineering',
+                    semester: '4',
+                    gpa: '9.2'
+                },
+                {
+                    name: 'Amit Verma',
+                    email: 'amit.verma@nitranchi.ac.in',
+                    phone: '9876543212',
+                    course: 'Mechanical Engineering',
+                    semester: '2',
+                    gpa: '7.8'
+                }
+            ];
+
+            // Add sample data only if no students exist
+            if (studentManager.students.length === 0) {
+                sampleStudents.forEach(studentData => {
+                    studentManager.addStudent(studentData);
+                });
+                studentManager.renderStudents();
+            }
+        }
+
+        // Uncomment the line below to add sample data automatically
+        // addSampleData();
+    </script>
+</body>
+</html>
